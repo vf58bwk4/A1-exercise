@@ -11,43 +11,42 @@ import sim.toolkit.*;
  *
  */
 public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConstants {
-	private static final short MAX_SMS_SUBMIT_PDU_LEN = 164; // SMS-SUBMIT
+	static final short MAX_SMS_SUBMIT_PDU_LEN = 164; // SMS-SUBMIT
 																// {23.040_9.2.2.2}
-	private static final short MAX_TP_DA_LEN = 12; // TP-DA {23.040_9.2.2.2}
+	static final short MAX_TP_DA_LEN = 12; // TP-DA {23.040_9.2.2.2}
 
-	private static final byte[] menuTitle = { 'T', 'e', 's', 't' };
-	private static final byte[] menuItem1 = { 'R', 'u', 'n' };
+	static final byte[] menuTitle = { 'T', 'e', 's', 't' };
+	static final byte[] menuItem1 = { 'R', 'u', 'n' };
 
-	private static final byte[] enter1_Text = { 'E', 'n', 't', 'e', 'r', ' ', 'n', 'u', 'm', 'b', 'e', 'r' };
-	private static final byte enter1_CommandQualifier = 0; // digits only
+	static final byte[] enter1_Text = { 'E', 'n', 't', 'e', 'r', ' ', 'n', 'u', 'm', 'b', 'e', 'r' };
+	static final byte enter1_CommandQualifier = 0; // digits only
 															// {102_223_8.6}
-	private static final short enter1_Min = 1;
-	private static final short enter1_Max = 21; // max number is '+'-sign + 10
+	static final short enter1_Min = 1;
+	static final short enter1_Max = 21; // max number is '+'-sign + 10
 												// bytes (20 BCD-digits)
 												// {23.040_9.2.2.2}
 
-	private static final byte[] enter2_Text = { 'E', 'n', 't', 'e', 'r', ' ', 't', 'e', 'x', 't' };
-	private static final byte enter2_CommandQualifier = 1; // SMS default
+	static final byte[] enter2_Text = { 'E', 'n', 't', 'e', 'r', ' ', 't', 'e', 'x', 't' };
+	static final byte enter2_CommandQualifier = 1; // SMS default
 															// alphabet
 	// {102_223_8.6}
-	private static final short enter2_Min = 0;
-	private static final short enter2_Max = 160; // max characters in sms with
+	static final short enter2_Min = 0;
+	static final short enter2_Max = 160; // max characters in sms with
 													// DCS=0
 
-	private static byte[] enteredNum = new byte[enter1_Max];
-	private static byte[] enteredText = new byte[enter2_Max];
-	private static byte[] PDU = new byte[184]; // SMS-SUBMIT PDU with non-packed
-												// UD
-	private static byte[] TP_DA = new byte[MAX_TP_DA_LEN];
+	static byte[] enteredNum;
+	static byte[] enteredText;
+	static byte[] PDU;
+	static byte[] TP_DA;
 
-	private static final byte[] interceptAddress = { (byte) 0x81, (byte) 0x21, (byte) 0x43 }; // 1234
+	static final byte[] interceptAddress = { (byte) 0x81, (byte) 0x21, (byte) 0x43 }; // 1234
 	// private static final byte[] interceptText = { 's', 'u', 'b', 's' };
-	private static final byte[] ussdSub = { (byte) 0xF0, (byte) 0xAA, (byte) 0x98, (byte) 0x6C, (byte) 0x46,
+	static final byte[] ussdSub = { (byte) 0xF0, (byte) 0xAA, (byte) 0x98, (byte) 0x6C, (byte) 0x46,
 			(byte) 0x53, (byte) 0xD1, (byte) 0x66, (byte) 0xB2, (byte) 0xD8, (byte) 0x08 }; // ussd:
 																							// *1234*4321#
 																							// DCS=F0
 
-	public static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
+	static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
 		short ci, si, ni;
 		if (source[0] == '+') {
 			converted[1] = (byte) 0x91; // NPI is E.164, TON is International
@@ -95,7 +94,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	}
 
 	// TP-VPF == 0: TP-VP field not present {23.040_9.2.3.3}
-	public static short Make_SMS_Submit_PDU(byte[] PDU, byte TP_RD, byte TP_RP, byte TP_UDHI, byte TP_SRR, byte TP_MR,
+	static short Make_SMS_Submit_PDU(byte[] PDU, byte TP_RD, byte TP_RP, byte TP_UDHI, byte TP_SRR, byte TP_MR,
 			byte[] TP_DA, byte TP_PID, byte TP_DCS, byte TP_UDL, byte[] TP_UD, short TP_UDLength) {
 		byte PDU0 = (byte) 0;
 		PDU0 |= 1 << 6; // TP-MTI = 1: SMS-SUBMIT {23.040_9.2.3.1}
@@ -127,6 +126,11 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	}
 
 	public static void install(byte bArray[], short bOffset, byte bLength) {
+		enteredNum = JCSystem.makeTransientByteArray(enter1_Max, JCSystem.CLEAR_ON_RESET);
+		enteredText = JCSystem.makeTransientByteArray(enter2_Max, JCSystem.CLEAR_ON_RESET);
+		// SMS-SUBMIT PDU with non-packed UD
+		PDU = JCSystem.makeTransientByteArray((short) 184, JCSystem.CLEAR_ON_RESET);
+		TP_DA = JCSystem.makeTransientByteArray(MAX_TP_DA_LEN, JCSystem.CLEAR_ON_RESET);
 		new Exercise1();
 	}
 
@@ -145,7 +149,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		}
 	}
 
-	private static void processEventMenuSelection() {
+	static void processEventMenuSelection() {
 		byte result;
 		ProactiveHandler ph = ProactiveHandler.getTheHandler();
 
@@ -163,7 +167,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		}
 	}
 
-private static void processItem1() {
+	static void processItem1() {
 		byte result;
 		short enteredNum_length = 0, enteredText_length = 0;
 		ProactiveResponseHandler prh;
@@ -213,7 +217,7 @@ private static void processItem1() {
 		result = ph.send();
 	}
 
-	private static void processMOShortMessageControlBySIM() {
+	static void processMOShortMessageControlBySIM() {
 		byte result;
 		boolean intercepted;
 		ProactiveHandler ph;
