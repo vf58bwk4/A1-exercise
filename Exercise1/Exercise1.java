@@ -36,7 +36,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 	private static byte[] enteredNum = new byte[enter1_Max];
 	private static byte[] enteredText = new byte[enter2_Max];
-	private static byte[] PDU = new byte[184]; // SMS-SUBMIT PDU with non-packed UD
+	private static byte[] PDU = new byte[184]; // SMS-SUBMIT PDU with non-packed
+												// UD
 	private static byte[] TP_DA = new byte[MAX_TP_DA_LEN];
 
 	private static final byte[] interceptAddress = { (byte) 0x81, (byte) 0x21, (byte) 0x43 }; // 1234
@@ -46,8 +47,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 																							// *1234*4321#
 																							// DCS=F0
 
-	public static int Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
-		int ci, si, ni;
+	public static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
+		short ci, si, ni;
 		if (source[0] == '+') {
 			converted[1] = (byte) 0x91; // NPI is E.164, TON is International
 										// {102_223_8.1}
@@ -79,7 +80,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 				n = (byte) 0x0B;
 				break;
 			default:
-				return -si;
+				return 0;
 			}
 
 			if (ni % 2 == 1)
@@ -146,12 +147,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 	private static void processEventMenuSelection() {
 		byte result;
-		ProactiveHandler ph;
-		ProactiveResponseHandler prh;
-		boolean formCompleted;
-		short enteredNum_length = 0, enteredText_length = 0;
+		ProactiveHandler ph = ProactiveHandler.getTheHandler();
 
-		ph = ProactiveHandler.getTheHandler();
 		ph.init(PRO_CMD_SELECT_ITEM, (byte) 0, DEV_ID_ME);
 		ph.appendTLV((byte) TAG_ALPHA_IDENTIFIER, menuTitle, (short) 0, (short) menuTitle.length);
 		ph.appendTLV((byte) TAG_ITEM, (byte) 1, menuItem1, (short) 0, (short) menuItem1.length);
@@ -160,65 +157,67 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		case RES_CMD_PERF:
 			switch (ProactiveResponseHandler.getTheHandler().getItemIdentifier()) {
 			case 1:
-				formCompleted = false;
-				ph = ProactiveHandler.getTheHandler();
-				ph.initGetInput(enter1_CommandQualifier, DCS_8_BIT_DATA, enter1_Text, (byte) 0,
-						(short) enter1_Text.length, enter1_Min, enter1_Max);
-				result = ph.send();
-				switch (result) {
-				case RES_CMD_PERF:
-					prh = ProactiveResponseHandler.getTheHandler();
-					enteredNum_length = prh.getTextStringLength();
-					prh.copyTextString(enteredNum, (short) 0);
-					formCompleted &= true;
-					break;
-				}
-				if (!formCompleted)
-					break;
-
-				ph = ProactiveHandler.getTheHandler();
-				ph.initGetInput(enter2_CommandQualifier, DCS_8_BIT_DATA, enter2_Text, (byte) 0,
-						(short) enter2_Text.length, enter2_Min, enter2_Max);
-				result = ph.send();
-				switch (result) {
-				case RES_CMD_PERF:
-					prh = ProactiveResponseHandler.getTheHandler();
-					enteredText_length = prh.getTextStringLength();
-					prh.copyTextString(enteredText, (short) 0);
-					formCompleted &= true;
-					break;
-				}
-
-				if (Make_TP_DA(TP_DA, enteredNum, enteredNum_length) > 0)
-					formCompleted &= true;
-
-				if (!formCompleted)
-					break;
-
-				ph = ProactiveHandler.getTheHandler();
-				// packing is required {102_223_8.6}
-				ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 1, DEV_ID_NETWORK);
-				ph.appendTLV((byte) TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
-
-				// TP-RD = TP-RP TP-UDHI = TP-SRR = TP-MR = TP-PID = TP-DCS
-				// = 0
-				short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA,
-						(byte) 0, (byte) 0, (byte) enteredText_length, enteredText, enteredText_length);
-				ph.appendTLV((byte) TAG_SMS_TPDU, PDU, (short) 0, PDU_length);
-				result = ph.send();
-				break;
+				processItem1();
 			default:
 			}
 		}
 	}
 
+private static void processItem1() {
+		byte result;
+		short enteredNum_length = 0, enteredText_length = 0;
+		ProactiveResponseHandler prh;
+		ProactiveHandler ph = ProactiveHandler.getTheHandler();
+
+		ph.initGetInput(enter1_CommandQualifier, DCS_8_BIT_DATA, enter1_Text, (byte) 0, (short) enter1_Text.length,
+				enter1_Min, enter1_Max);
+		result = ph.send();
+		switch (result) {
+		case RES_CMD_PERF:
+			prh = ProactiveResponseHandler.getTheHandler();
+			enteredNum_length = prh.getTextStringLength();
+			prh.copyTextString(enteredNum, (short) 0);
+			break;
+		default:
+			return;
+		}
+
+		ph = ProactiveHandler.getTheHandler();
+		ph.initGetInput(enter2_CommandQualifier, DCS_8_BIT_DATA, enter2_Text, (byte) 0, (short) enter2_Text.length,
+				enter2_Min, enter2_Max);
+		result = ph.send();
+		switch (result) {
+		case RES_CMD_PERF:
+			prh = ProactiveResponseHandler.getTheHandler();
+			enteredText_length = prh.getTextStringLength();
+			prh.copyTextString(enteredText, (short) 0);
+			break;
+		default:
+			return;
+		}
+
+		result = Make_TP_DA(TP_DA, enteredNum, enteredNum_length);
+		if (result == 0)
+			return;
+
+		ph = ProactiveHandler.getTheHandler();
+		// packing is required {102_223_8.6}
+		ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 1, DEV_ID_NETWORK);
+		ph.appendTLV((byte) TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
+
+		// TP-RD = TP-RP TP-UDHI = TP-SRR = TP-MR = TP-PID = TP-DCS
+		// = 0
+		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
+				(byte) 0, (byte) enteredText_length, enteredText, enteredText_length);
+		ph.appendTLV((byte) TAG_SMS_TPDU, PDU, (short) 0, PDU_length);
+		result = ph.send();
+	}
+
 	private static void processMOShortMessageControlBySIM() {
 		byte result;
-		ProactiveHandler ph;
-		EnvelopeHandler eh;
 		boolean intercepted;
-
-		eh = EnvelopeHandler.getTheHandler();
+		ProactiveHandler ph;
+		EnvelopeHandler eh = EnvelopeHandler.getTheHandler();
 		// looking to 2nd Address data object - TP_Destination_Address
 		intercepted = (eh.findAndCompareValue(TAG_ADDRESS, (byte) 2, (short) 0, interceptAddress, (short) 0,
 				(short) interceptAddress.length) == 0);
