@@ -1,0 +1,14 @@
+mode_211
+
+establish_context
+card_connect
+//enable_trace
+
+select -AID A000000003000000
+open_sc -security 0 -keyind 0 -keyver 0 -enc_key 7EFE1CF03BAA2087478D0124F9083043 -mac_key 9B5C4FB221DCFAAE356CB7D589CEBACE
+
+get_status -element 20
+get_status -element 40
+
+card_disconnect
+release_context

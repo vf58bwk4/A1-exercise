@@ -12,27 +12,23 @@ import sim.toolkit.*;
  */
 public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConstants {
 	static final short MAX_SMS_SUBMIT_PDU_LEN = 164; // SMS-SUBMIT
-																// {23.040_9.2.2.2}
+														// {23.040_9.2.2.2}
 	static final short MAX_TP_DA_LEN = 12; // TP-DA {23.040_9.2.2.2}
 
 	static final byte[] menuTitle = { 'T', 'e', 's', 't' };
 	static final byte[] menuItem1 = { 'R', 'u', 'n' };
 
 	static final byte[] enter1_Text = { 'E', 'n', 't', 'e', 'r', ' ', 'n', 'u', 'm', 'b', 'e', 'r' };
-	static final byte enter1_CommandQualifier = 0; // digits only
-															// {102_223_8.6}
+	static final byte enter1_CommandQualifier = 0; // digits only {102_223_8.6}
 	static final short enter1_Min = 1;
-	static final short enter1_Max = 21; // max number is '+'-sign + 10
-												// bytes (20 BCD-digits)
-												// {23.040_9.2.2.2}
+	static final short enter1_Max = 21; // max number is '+'-sign + 10 bytes (20
+										// BCD-digits) {23.040_9.2.2.2}
 
 	static final byte[] enter2_Text = { 'E', 'n', 't', 'e', 'r', ' ', 't', 'e', 'x', 't' };
-	static final byte enter2_CommandQualifier = 1; // SMS default
-															// alphabet
-	// {102_223_8.6}
+	static final byte enter2_CommandQualifier = 1; // SMS default alphabet
+													// {102_223_8.6}
 	static final short enter2_Min = 0;
-	static final short enter2_Max = 160; // max characters in sms with
-													// DCS=0
+	static final short enter2_Max = 160; // max characters in sms with DCS=0
 
 	static byte[] enteredNum;
 	static byte[] enteredText;
@@ -41,10 +37,10 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 	static final byte[] interceptAddress = { (byte) 0x81, (byte) 0x21, (byte) 0x43 }; // 1234
 	// private static final byte[] interceptText = { 's', 'u', 'b', 's' };
-	static final byte[] ussdSub = { (byte) 0xF0, (byte) 0xAA, (byte) 0x98, (byte) 0x6C, (byte) 0x46,
-			(byte) 0x53, (byte) 0xD1, (byte) 0x66, (byte) 0xB2, (byte) 0xD8, (byte) 0x08 }; // ussd:
-																							// *1234*4321#
-																							// DCS=F0
+	static final byte[] ussdSub = { (byte) 0xF0, (byte) 0xAA, (byte) 0x98, (byte) 0x6C, (byte) 0x46, (byte) 0x53,
+			(byte) 0xD1, (byte) 0x66, (byte) 0xB2, (byte) 0xD8, (byte) 0x08 }; // ussd:
+																				// *1234*4321#
+																				// DCS=F0
 
 	static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
 		short ci, si, ni;
@@ -117,7 +113,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		return (short) (pi + TP_UDLength);
 	}
 
-	public Exercise1() {
+	private Exercise1() {
 		ToolkitRegistry reg = ToolkitRegistry.getEntry();
 		reg.initMenuEntry(menuTitle, (short) 0, (short) menuTitle.length, PRO_CMD_DISPLAY_TEXT, false, (byte) 0,
 				(short) 0);
@@ -126,12 +122,12 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	}
 
 	public static void install(byte bArray[], short bOffset, byte bLength) {
+		new Exercise1();
 		enteredNum = JCSystem.makeTransientByteArray(enter1_Max, JCSystem.CLEAR_ON_RESET);
 		enteredText = JCSystem.makeTransientByteArray(enter2_Max, JCSystem.CLEAR_ON_RESET);
 		// SMS-SUBMIT PDU with non-packed UD
 		PDU = JCSystem.makeTransientByteArray((short) 184, JCSystem.CLEAR_ON_RESET);
 		TP_DA = JCSystem.makeTransientByteArray(MAX_TP_DA_LEN, JCSystem.CLEAR_ON_RESET);
-		new Exercise1();
 	}
 
 	public void process(APDU apdu) {
@@ -233,7 +229,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 			ph.init(PRO_CMD_SEND_USSD, (byte) 0, DEV_ID_NETWORK);
 			ph.appendTLV(TAG_USSD_STRING, ussdSub, (short) 0, (short) ussdSub.length);
 			result = ph.send();
-		}
+		} 
 	}
 
 }
