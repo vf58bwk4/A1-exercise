@@ -18,6 +18,9 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	static final byte[] menuTitle = { 'T', 'e', 's', 't' };
 	static final byte[] menuItem1 = { 'R', 'u', 'n' };
 
+	static final byte[] aiSMSSending = { 'S', 'e', 'n', 'd', 'i', 'n', 'g', ' ', 'S', 'M', 'S' };
+	static final byte[] aiUSSDSending = { 'S', 'e', 'n', 'd', 'i', 'n', 'g', ' ', 'U', 'S', 'S', 'D' };
+
 	static final byte[] enter1_Text = { 'E', 'n', 't', 'e', 'r', ' ', 'n', 'u', 'm', 'b', 'e', 'r' };
 	static final byte enter1_CommandQualifier = 0; // digits only {102_223_8.6}
 	static final short enter1_Min = 1;
@@ -92,14 +95,13 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	// TP-VPF == 0: TP-VP field not present {23.040_9.2.3.3}
 	static short Make_SMS_Submit_PDU(byte[] PDU, byte TP_RD, byte TP_RP, byte TP_UDHI, byte TP_SRR, byte TP_MR,
 			byte[] TP_DA, byte TP_PID, byte TP_DCS, byte TP_UDL, byte[] TP_UD, short TP_UDLength) {
-		byte PDU0 = (byte) 0;
-		PDU0 |= 1 << 6; // TP-MTI = 1: SMS-SUBMIT {23.040_9.2.3.1}
+		short PDU0 = 1 << 6; // TP-MTI = 1: SMS-SUBMIT {23.040_9.2.3.1}
 		PDU0 |= TP_RD << 5;
 		PDU0 |= TP_SRR << 2;
 		PDU0 |= TP_UDHI << 1;
 		PDU0 |= TP_RP;
 
-		PDU[0] = PDU0;
+		PDU[0] = (byte) PDU0;
 		PDU[1] = TP_MR;
 
 		short pi = (short) (TP_DA[0] + 1);
@@ -123,6 +125,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 	public static void install(byte bArray[], short bOffset, byte bLength) {
 		new Exercise1();
+		new Debug();
 		enteredNum = JCSystem.makeTransientByteArray(enter1_Max, JCSystem.CLEAR_ON_RESET);
 		enteredText = JCSystem.makeTransientByteArray(enter2_Max, JCSystem.CLEAR_ON_RESET);
 		// SMS-SUBMIT PDU with non-packed UD
@@ -150,8 +153,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		ProactiveHandler ph = ProactiveHandler.getTheHandler();
 
 		ph.init(PRO_CMD_SELECT_ITEM, (byte) 0, DEV_ID_ME);
-		ph.appendTLV((byte) TAG_ALPHA_IDENTIFIER, menuTitle, (short) 0, (short) menuTitle.length);
-		ph.appendTLV((byte) TAG_ITEM, (byte) 1, menuItem1, (short) 0, (short) menuItem1.length);
+		ph.appendTLV(TAG_ALPHA_IDENTIFIER, menuTitle, (short) 0, (short) menuTitle.length);
+		ph.appendTLV(TAG_ITEM, (byte) 1, menuItem1, (short) 0, (short) menuItem1.length);
 		result = ph.send();
 		switch (result) {
 		case RES_CMD_PERF:
@@ -199,18 +202,22 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		result = Make_TP_DA(TP_DA, enteredNum, enteredNum_length);
 		if (result == 0)
 			return;
+		Debug.displayByte(TP_DA, (short) (result + 1));
+		// TP-RD=TP-RP=TP-UDHI=TP-SRR=TP-MR=TP-PID=TP-DCS = 0
+		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
+				(byte) 0, (byte) enteredText_length, enteredText, enteredText_length);
 
+		Debug.displayByte((byte) PDU_length);
+		Debug.displayByte(PDU, PDU_length);
 		ph = ProactiveHandler.getTheHandler();
 		// packing is required {102_223_8.6}
 		ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 1, DEV_ID_NETWORK);
-		ph.appendTLV((byte) TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
+		ph.appendTLV(TAG_ALPHA_IDENTIFIER, aiSMSSending, (short) 0, (short) aiSMSSending.length);
+		// ph.appendTLV(TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
 
-		// TP-RD = TP-RP TP-UDHI = TP-SRR = TP-MR = TP-PID = TP-DCS
-		// = 0
-		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
-				(byte) 0, (byte) enteredText_length, enteredText, enteredText_length);
-		ph.appendTLV((byte) TAG_SMS_TPDU, PDU, (short) 0, PDU_length);
+		ph.appendTLV(TAG_SMS_TPDU, PDU, (short) 0, PDU_length);
 		result = ph.send();
+		Debug.displayByte(result);
 	}
 
 	static void processMOShortMessageControlBySIM() {
@@ -227,9 +234,9 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 			ph = ProactiveHandler.getTheHandler();
 			ph.init(PRO_CMD_SEND_USSD, (byte) 0, DEV_ID_NETWORK);
+			ph.appendTLV(TAG_ALPHA_IDENTIFIER, aiUSSDSending, (short) 0, (short) aiUSSDSending.length);
 			ph.appendTLV(TAG_USSD_STRING, ussdSub, (short) 0, (short) ussdSub.length);
 			result = ph.send();
-		} 
+		}
 	}
-
 }

@@ -1,0 +1,19 @@
+25
+aj
+028152
+0A
+40 00 028152 00 00 02 616A
+MTI=01 // sms-submit
+RD=0
+VPF=0
+SRR=0
+UDHI=0
+RP=0
+
+MR=00
+DA=028152 // 25
+PID=00
+DCS=00
+VP=<> // vpf=0
+UDL=02
+UD=616A // aj
