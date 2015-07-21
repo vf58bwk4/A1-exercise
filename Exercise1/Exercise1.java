@@ -120,17 +120,17 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		reg.initMenuEntry(menuTitle, (short) 0, (short) menuTitle.length, PRO_CMD_DISPLAY_TEXT, false, (byte) 0,
 				(short) 0);
 		reg.setEvent(EVENT_MO_SHORT_MESSAGE_CONTROL_BY_SIM);
-		register();
+		new Debug();
 	}
 
 	public static void install(byte bArray[], short bOffset, byte bLength) {
-		new Exercise1();
-		new Debug();
 		enteredNum = JCSystem.makeTransientByteArray(enter1_Max, JCSystem.CLEAR_ON_RESET);
 		enteredText = JCSystem.makeTransientByteArray(enter2_Max, JCSystem.CLEAR_ON_RESET);
 		// SMS-SUBMIT PDU with non-packed UD
 		PDU = JCSystem.makeTransientByteArray((short) 184, JCSystem.CLEAR_ON_RESET);
 		TP_DA = JCSystem.makeTransientByteArray(MAX_TP_DA_LEN, JCSystem.CLEAR_ON_RESET);
+
+		new Exercise1().register();
 	}
 
 	public void process(APDU apdu) {
@@ -202,16 +202,14 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		result = Make_TP_DA(TP_DA, enteredNum, enteredNum_length);
 		if (result == 0)
 			return;
-		Debug.displayByte(TP_DA, (short) (result + 1));
-		// TP-RD=TP-RP=TP-UDHI=TP-SRR=TP-MR=TP-PID=TP-DCS = 0
-		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
-				(byte) 0, (byte) enteredText_length, enteredText, enteredText_length);
 
-		Debug.displayByte((byte) PDU_length);
-		Debug.displayByte(PDU, PDU_length);
+		// RD=RP=UDHI=SRR=MR=PID = 0
+		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
+				DCS_8_BIT_DATA, (byte) enteredText_length, enteredText, enteredText_length);
+
 		ph = ProactiveHandler.getTheHandler();
-		// packing is required {102_223_8.6}
-		ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 1, DEV_ID_NETWORK);
+		// =1 - packing is required {102_223_8.6}
+		ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0, DEV_ID_NETWORK);
 		ph.appendTLV(TAG_ALPHA_IDENTIFIER, aiSMSSending, (short) 0, (short) aiSMSSending.length);
 		// ph.appendTLV(TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
 
@@ -237,6 +235,9 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 			ph.appendTLV(TAG_ALPHA_IDENTIFIER, aiUSSDSending, (short) 0, (short) aiUSSDSending.length);
 			ph.appendTLV(TAG_USSD_STRING, ussdSub, (short) 0, (short) ussdSub.length);
 			result = ph.send();
+		} else {
+			EnvelopeResponseHandler.getTheHandler().postAsBERTLV(SW1_RP_ACK, (byte) 0);
+			Debug.displayByte((byte) 0x81);
 		}
 	}
 }

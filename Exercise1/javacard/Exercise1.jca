@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Tue Jul 21 17:11:33 MSK 2015
+// on Tue Jul 21 23:10:05 MSK 2015
 
 .package Exercise1 {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -55,23 +55,23 @@
 		// 16
 		virtualMethodRef 1.9.9(B)V;		// setEvent(B)V
 		// 17
-		virtualMethodRef 2.3.1()V;		// register()V
-		// 18
-		classRef Exercise1;
-		// 19
-		staticMethodRef Exercise1/<init>()V;
-		// 20
 		classRef Debug;
-		// 21
+		// 18
 		staticMethodRef Debug/<init>()V;
-		// 22
+		// 19
 		staticFieldRef byte[] Exercise1/enteredNum;
-		// 23
+		// 20
 		staticFieldRef byte[] Exercise1/enteredText;
-		// 24
+		// 21
 		staticFieldRef byte[] Exercise1/PDU;
-		// 25
+		// 22
 		staticFieldRef byte[] Exercise1/TP_DA;
+		// 23
+		classRef Exercise1;
+		// 24
+		staticMethodRef Exercise1/<init>()V;
+		// 25
+		virtualMethodRef 2.3.1()V;		// register()V
 		// 26
 		staticMethodRef Exercise1/processEventMenuSelection()V;
 		// 27
@@ -105,30 +105,28 @@
 		// 40
 		staticMethodRef Exercise1/Make_TP_DA([B[BS)B;
 		// 41
-		staticMethodRef Debug/displayByte([BS)V;
-		// 42
 		staticMethodRef Exercise1/Make_SMS_Submit_PDU([BBBBBB[BBBB[BS)S;
+		// 42
+		staticFieldRef byte[] Exercise1/aiSMSSending;
 		// 43
 		staticMethodRef Debug/displayByte(B)V;
 		// 44
-		staticFieldRef byte[] Exercise1/aiSMSSending;
-		// 45
 		staticMethodRef 1.8.0()Lsim/toolkit/EnvelopeHandler;;		// sim/toolkit/EnvelopeHandler.getTheHandler()Lsim/toolkit/EnvelopeHandler;
 			.descriptor	Lsim/toolkit/EnvelopeHandler;	1.8;
 
-		// 46
+		// 45
 		staticFieldRef byte[] Exercise1/interceptAddress;
-		// 47
+		// 46
 		virtualMethodRef 1.8.8(BBS[BSS)B;		// findAndCompareValue(BBS[BSS)B
-		// 48
+		// 47
 		staticMethodRef 1.6.0()Lsim/toolkit/EnvelopeResponseHandler;;		// sim/toolkit/EnvelopeResponseHandler.getTheHandler()Lsim/toolkit/EnvelopeResponseHandler;
 			.descriptor	Lsim/toolkit/EnvelopeResponseHandler;	1.6;
 
-		// 49
+		// 48
 		virtualMethodRef 1.6.19(BB)V;		// postAsBERTLV(BB)V
-		// 50
+		// 49
 		staticFieldRef byte[] Exercise1/aiUSSDSending;
-		// 51
+		// 50
 		staticFieldRef byte[] Exercise1/ussdSub;
 	}
 
@@ -451,42 +449,34 @@
 			.stack 5;
 			.locals 2;
 
-				L0:	sconst_0;
-					sstore 12;
-					sload 12;
-					bspush 64;
-					sor;
-					s2b;
+				L0:	bspush 64;
 					sstore 12;
 					sload 12;
 					sload_1;
 					sconst_5;
 					sshl;
 					sor;
-					s2b;
 					sstore 12;
 					sload 12;
 					sload 4;
 					sconst_2;
 					sshl;
 					sor;
-					s2b;
 					sstore 12;
 					sload 12;
 					sload_3;
 					sconst_1;
 					sshl;
 					sor;
-					s2b;
 					sstore 12;
 					sload 12;
 					sload_2;
 					sor;
-					s2b;
 					sstore 12;
 					aload_0;
 					sconst_0;
 					sload 12;
+					s2b;
 					bastore;
 					aload_0;
 					sconst_1;
@@ -556,8 +546,10 @@
 					aload_1;
 					bspush 10;
 					invokevirtual 16;		// setEvent(B)V
-					aload_0;
-					invokevirtual 17;		// register()V
+					new 17;		// Exercise1/Debug
+					dup;
+					invokespecial 18;		// Exercise1/Debug.<init>()V
+					pop;
 					return;
 		}
 
@@ -565,30 +557,26 @@
 			.stack 2;
 			.locals 0;
 
-				L0:	new 18;		// Exercise1/Exercise1
-					dup;
-					invokespecial 19;		// Exercise1/Exercise1.<init>()V
-					pop;
-					new 20;		// Exercise1/Debug
-					dup;
-					invokespecial 21;		// Exercise1/Debug.<init>()V
-					pop;
-					bspush 21;
+				L0:	bspush 21;
 					sconst_1;
 					invokestatic 5;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-					putstatic_a 22;		// reference Exercise1/Exercise1.enteredNum
+					putstatic_a 19;		// reference Exercise1/Exercise1.enteredNum
 					sspush 160;
 					sconst_1;
 					invokestatic 5;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-					putstatic_a 23;		// reference Exercise1/Exercise1.enteredText
+					putstatic_a 20;		// reference Exercise1/Exercise1.enteredText
 					sspush 184;
 					sconst_1;
 					invokestatic 5;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-					putstatic_a 24;		// reference Exercise1/Exercise1.PDU
+					putstatic_a 21;		// reference Exercise1/Exercise1.PDU
 					bspush 12;
 					sconst_1;
 					invokestatic 5;		// javacard/framework/JCSystem.makeTransientByteArray(SB)[B
-					putstatic_a 25;		// reference Exercise1/Exercise1.TP_DA
+					putstatic_a 22;		// reference Exercise1/Exercise1.TP_DA
+					new 23;		// Exercise1/Exercise1
+					dup;
+					invokespecial 24;		// Exercise1/Exercise1.<init>()V
+					invokevirtual 25;		// register()V
 					return;
 		}
 
@@ -683,7 +671,7 @@
 					invokevirtual 37;		// getTextStringLength()S
 					sstore_1;
 					aload_3;
-					getstatic_a 22;		// reference Exercise1/Exercise1.enteredNum
+					getstatic_a 19;		// reference Exercise1/Exercise1.enteredNum
 					sconst_0;
 					invokevirtual 38;		// copyTextString([BS)S
 					pop;
@@ -712,63 +700,52 @@
 					invokevirtual 37;		// getTextStringLength()S
 					sstore_2;
 					aload_3;
-					getstatic_a 23;		// reference Exercise1/Exercise1.enteredText
+					getstatic_a 20;		// reference Exercise1/Exercise1.enteredText
 					sconst_0;
 					invokevirtual 38;		// copyTextString([BS)S
 					pop;
 					goto L6;
 				L5:	return;
-				L6:	getstatic_a 25;		// reference Exercise1/Exercise1.TP_DA
-					getstatic_a 22;		// reference Exercise1/Exercise1.enteredNum
+				L6:	getstatic_a 22;		// reference Exercise1/Exercise1.TP_DA
+					getstatic_a 19;		// reference Exercise1/Exercise1.enteredNum
 					sload_1;
 					invokestatic 40;		// Exercise1/Exercise1.Make_TP_DA([B[BS)B
 					sstore_0;
 					sload_0;
 					ifne L8;
 				L7:	return;
-				L8:	getstatic_a 25;		// reference Exercise1/Exercise1.TP_DA
-					sload_0;
-					sconst_1;
-					sadd;
-					invokestatic 41;		// Exercise1/Debug.displayByte([BS)V
-					getstatic_a 24;		// reference Exercise1/Exercise1.PDU
+				L8:	getstatic_a 21;		// reference Exercise1/Exercise1.PDU
 					sconst_0;
 					sconst_0;
 					sconst_0;
 					sconst_0;
 					sconst_0;
-					getstatic_a 25;		// reference Exercise1/Exercise1.TP_DA
+					getstatic_a 22;		// reference Exercise1/Exercise1.TP_DA
 					sconst_0;
-					sconst_0;
+					sconst_4;
 					sload_2;
 					s2b;
-					getstatic_a 23;		// reference Exercise1/Exercise1.enteredText
+					getstatic_a 20;		// reference Exercise1/Exercise1.enteredText
 					sload_2;
-					invokestatic 42;		// Exercise1/Exercise1.Make_SMS_Submit_PDU([BBBBBB[BBBB[BS)S
+					invokestatic 41;		// Exercise1/Exercise1.Make_SMS_Submit_PDU([BBBBBB[BBBB[BS)S
 					sstore 5;
-					sload 5;
-					s2b;
-					invokestatic 43;		// Exercise1/Debug.displayByte(B)V
-					getstatic_a 24;		// reference Exercise1/Exercise1.PDU
-					sload 5;
-					invokestatic 41;		// Exercise1/Debug.displayByte([BS)V
 					invokestatic 7;		// sim/toolkit/ProactiveHandler.getTheHandler()Lsim/toolkit/ProactiveHandler;
 					astore 4;
 					aload 4;
 					bspush 19;
-					sconst_1;
+					sconst_0;
 					bspush -125;
 					invokevirtual 28;		// init(BBB)V
 					aload 4;
 					sconst_5;
-					getstatic_a 44;		// reference Exercise1/Exercise1.aiSMSSending
+					getstatic_a 42;		// reference Exercise1/Exercise1.aiSMSSending
 					sconst_0;
-					getstatic_a 44;		// reference Exercise1/Exercise1.aiSMSSending
+					getstatic_a 42;		// reference Exercise1/Exercise1.aiSMSSending
 					arraylength;
 					invokevirtual 29;		// appendTLV(B[BSS)V
 					aload 4;
 					bspush 11;
-					getstatic_a 24;		// reference Exercise1/Exercise1.PDU
+					getstatic_a 21;		// reference Exercise1/Exercise1.PDU
 					sconst_0;
 					sload 5;
 					invokevirtual 29;		// appendTLV(B[BSS)V
@@ -784,17 +761,17 @@
 			.stack 7;
 			.locals 4;
 
-				L0:	invokestatic 45;		// sim/toolkit/EnvelopeHandler.getTheHandler()Lsim/toolkit/EnvelopeHandler;
+				L0:	invokestatic 44;		// sim/toolkit/EnvelopeHandler.getTheHandler()Lsim/toolkit/EnvelopeHandler;
 					astore_3;
 					aload_3;
 					bspush 6;
 					sconst_2;
 					sconst_0;
-					getstatic_a 46;		// reference Exercise1/Exercise1.interceptAddress
+					getstatic_a 45;		// reference Exercise1/Exercise1.interceptAddress
 					sconst_0;
-					getstatic_a 46;		// reference Exercise1/Exercise1.interceptAddress
+					getstatic_a 45;		// reference Exercise1/Exercise1.interceptAddress
 					arraylength;
-					invokevirtual 47;		// findAndCompareValue(BBS[BSS)B
+					invokevirtual 46;		// findAndCompareValue(BBS[BSS)B
 					ifne L2;
 				L1:	sconst_1;
 					goto L3;
@@ -802,10 +779,10 @@
 				L3:	sstore_1;
 					sload_1;
 					ifeq L5;
-				L4:	invokestatic 48;		// sim/toolkit/EnvelopeResponseHandler.getTheHandler()Lsim/toolkit/EnvelopeResponseHandler;
+				L4:	invokestatic 47;		// sim/toolkit/EnvelopeResponseHandler.getTheHandler()Lsim/toolkit/EnvelopeResponseHandler;
 					bspush -97;
 					sconst_1;
-					invokevirtual 49;		// postAsBERTLV(BB)V
+					invokevirtual 48;		// postAsBERTLV(BB)V
 					invokestatic 7;		// sim/toolkit/ProactiveHandler.getTheHandler()Lsim/toolkit/ProactiveHandler;
 					astore_2;
 					aload_2;
@@ -815,22 +792,29 @@
 					invokevirtual 28;		// init(BBB)V
 					aload_2;
 					sconst_5;
-					getstatic_a 50;		// reference Exercise1/Exercise1.aiUSSDSending
+					getstatic_a 49;		// reference Exercise1/Exercise1.aiUSSDSending
 					sconst_0;
-					getstatic_a 50;		// reference Exercise1/Exercise1.aiUSSDSending
+					getstatic_a 49;		// reference Exercise1/Exercise1.aiUSSDSending
 					arraylength;
 					invokevirtual 29;		// appendTLV(B[BSS)V
 					aload_2;
 					bspush 10;
-					getstatic_a 51;		// reference Exercise1/Exercise1.ussdSub
+					getstatic_a 50;		// reference Exercise1/Exercise1.ussdSub
 					sconst_0;
-					getstatic_a 51;		// reference Exercise1/Exercise1.ussdSub
+					getstatic_a 50;		// reference Exercise1/Exercise1.ussdSub
 					arraylength;
 					invokevirtual 29;		// appendTLV(B[BSS)V
 					aload_2;
 					invokevirtual 9;		// send()B
 					sstore_0;
-				L5:	return;
+					goto L6;
+				L5:	invokestatic 47;		// sim/toolkit/EnvelopeResponseHandler.getTheHandler()Lsim/toolkit/EnvelopeResponseHandler;
+					bspush -97;
+					sconst_0;
+					invokevirtual 48;		// postAsBERTLV(BB)V
+					bspush -127;
+					invokestatic 43;		// Exercise1/Debug.displayByte(B)V
+				L6:	return;
 		}
 
 	}
