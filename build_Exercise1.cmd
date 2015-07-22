@@ -7,3 +7,4 @@ javac -target 1.1 -source 1.3 -cp jars\SUN_JavaCard_2-2-1\jc_SUN_JavaCard_2-2-1.
 
 set JC_HOME=%JC22_HOME%
 %JC22_HOME%\bin\converter -exportpath exports\SUN_JavaCard_2-2-1;exports\ETSI_43019_6-0-0 -applet %AID% Exercise1 -out CAP EXP JCA Exercise1 %PKG_AID% 0.1
+

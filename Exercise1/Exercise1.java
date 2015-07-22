@@ -14,6 +14,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	static final short MAX_SMS_SUBMIT_PDU_LEN = 164; // SMS-SUBMIT
 														// {23.040_9.2.2.2}
 	static final short MAX_TP_DA_LEN = 12; // TP-DA {23.040_9.2.2.2}
+	static final short MAX_TP_UD_LEN = 140;
 
 	static final byte[] menuTitle = { 'T', 'e', 's', 't' };
 	static final byte[] menuItem1 = { 'R', 'u', 'n' };
@@ -33,10 +34,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 	static final short enter2_Min = 0;
 	static final short enter2_Max = 160; // max characters in sms with DCS=0
 
-	static byte[] enteredNum;
-	static byte[] enteredText;
-	static byte[] PDU;
-	static byte[] TP_DA;
+	static byte[] enteredNum, enteredText, PDU, TP_DA, TP_UD;
 
 	static final byte[] interceptAddress = { (byte) 0x81, (byte) 0x21, (byte) 0x43 }; // 1234
 	// private static final byte[] interceptText = { 's', 'u', 'b', 's' };
@@ -44,6 +42,25 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 			(byte) 0xD1, (byte) 0x66, (byte) 0xB2, (byte) 0xD8, (byte) 0x08 }; // ussd:
 																				// *1234*4321#
 																				// DCS=F0
+
+	static byte Pack_7bit(byte[] packed, byte[] src, short srcLen) {
+		if (srcLen < 1)
+			return (byte) srcLen;
+
+		packed[0] = (byte) (src[0] & 0x7F); // clear junk
+
+		short pi, ci;
+		for (pi = 0, ci = 1; ci < srcLen; pi++, ci++) {
+			short lsh, rsh;
+			rsh = (short) (ci % 8); // left part remains into current octet
+			lsh = (short) ((short) (8 - rsh) % 8); // right part goes to
+													// previous octet
+			byte s = (byte) (src[ci] & 0x7F); // clear junk
+			packed[pi] |= s << lsh;
+			packed[ci] = (byte) ((s & 0xFF) >> rsh);
+		}
+		return (byte) ci;
+	}
 
 	static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
 		short ci, si, ni;
@@ -94,7 +111,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 
 	// TP-VPF == 0: TP-VP field not present {23.040_9.2.3.3}
 	static short Make_SMS_Submit_PDU(byte[] PDU, byte TP_RD, byte TP_RP, byte TP_UDHI, byte TP_SRR, byte TP_MR,
-			byte[] TP_DA, byte TP_PID, byte TP_DCS, byte TP_UDL, byte[] TP_UD, short TP_UDLength) {
+			byte[] TP_DA, byte TP_PID, byte TP_DCS, byte TP_UDL, byte[] TP_UD, byte TP_UD_length) {
 		short PDU0 = 1 << 6; // TP-MTI = 1: SMS-SUBMIT {23.040_9.2.3.1}
 		PDU0 |= TP_RD << 5;
 		PDU0 |= TP_SRR << 2;
@@ -111,8 +128,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		PDU[pi++] = TP_PID;
 		PDU[pi++] = TP_DCS;
 		PDU[pi++] = TP_UDL;
-		Util.arrayCopyNonAtomic(TP_UD, (short) 0, PDU, (short) pi, TP_UDLength);
-		return (short) (pi + TP_UDLength);
+		Util.arrayCopyNonAtomic(TP_UD, (short) 0, PDU, (short) pi, TP_UD_length);
+		return (short) (pi + TP_UD_length);
 	}
 
 	private Exercise1() {
@@ -129,6 +146,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		// SMS-SUBMIT PDU with non-packed UD
 		PDU = JCSystem.makeTransientByteArray((short) 184, JCSystem.CLEAR_ON_RESET);
 		TP_DA = JCSystem.makeTransientByteArray(MAX_TP_DA_LEN, JCSystem.CLEAR_ON_RESET);
+		TP_UD = JCSystem.makeTransientByteArray(MAX_TP_UD_LEN, JCSystem.CLEAR_ON_RESET);
 
 		new Exercise1().register();
 	}
@@ -203,15 +221,17 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		if (result == 0)
 			return;
 
+		result = Pack_7bit(TP_UD, enteredText, enteredText_length);
 		// RD=RP=UDHI=SRR=MR=PID = 0
 		short PDU_length = Make_SMS_Submit_PDU(PDU, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, TP_DA, (byte) 0,
-				DCS_8_BIT_DATA, (byte) enteredText_length, enteredText, enteredText_length);
+				DCS_DEFAULT_ALPHABET, (byte) enteredText_length, TP_UD, result);
 
 		ph = ProactiveHandler.getTheHandler();
 		// =1 - packing is required {102_223_8.6}
 		ph.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0, DEV_ID_NETWORK);
 		ph.appendTLV(TAG_ALPHA_IDENTIFIER, aiSMSSending, (short) 0, (short) aiSMSSending.length);
-		// ph.appendTLV(TAG_ADDRESS, TP_DA, (short) 1, (short) TP_DA[0]);
+		// SMSC address
+		// ph.appendTLV(TAG_ADDRESS, TP_SCA, (short) 0, (short) TP_SCA.length);
 
 		ph.appendTLV(TAG_SMS_TPDU, PDU, (short) 0, PDU_length);
 		result = ph.send();
@@ -236,6 +256,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 			ph.appendTLV(TAG_USSD_STRING, ussdSub, (short) 0, (short) ussdSub.length);
 			result = ph.send();
 		} else {
+			// Allowed {31.111_7.3.2.2}
 			EnvelopeResponseHandler.getTheHandler().postAsBERTLV(SW1_RP_ACK, (byte) 0);
 			Debug.displayByte((byte) 0x81);
 		}
