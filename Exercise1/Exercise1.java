@@ -57,7 +57,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 													// previous octet
 			byte s = (byte) (src[ci] & 0x7F); // clear junk
 			packed[pi] |= s << lsh;
-			packed[ci] = (byte) ((s & 0xFF) >> rsh);
+			packed[ci] = (byte) (s >> rsh);
 		}
 		return (byte) ci;
 	}
