@@ -43,7 +43,7 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 																				// *1234*4321#
 																				// DCS=F0
 
-	static byte Pack_7bit(byte[] packed, byte[] src, short srcLen) {
+	public static byte Pack_7bit(byte[] packed, byte[] src, short srcLen) {
 		if (srcLen < 1)
 			return (byte) srcLen;
 
@@ -62,19 +62,19 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 		return (byte) ci;
 	}
 
-	static byte Make_TP_DA(byte[] converted, byte[] source, short sourceLength) {
-		short ci, si, ni;
-		if (source[0] == '+') {
-			converted[1] = (byte) 0x91; // NPI is E.164, TON is International
+	public static short Make_TP_DA(byte[] cnvrt, short cnvrtOff, byte[] src, short srcOff, short srcLen) {
+		short ci = (short) (cnvrtOff + 1), ni;
+		if (src[srcOff] == '+') {
+			cnvrt[ci] = (byte) 0x91; // NPI is E.164, TON is International
 										// {102_223_8.1}
-			si = 1;
+			srcOff++;
 		} else {
-			converted[1] = (byte) 0x81; // NPI is E.164, TON is Unknown
+			cnvrt[ci] = (byte) 0x81; // NPI is E.164, TON is Unknown
 										// {102_223_8.1}
-			si = 0;
 		}
-		for (ci = 2, ni = 0; si < sourceLength; ci += ni % 2, si++, ni++) {
-			byte n = source[si];
+		ci++;
+		for (ni = 0; srcOff < srcLen; ci += ni % 2, srcOff++, ni++) {
+			byte n = src[srcOff];
 			switch (n) {
 			case '0':
 			case '1':
@@ -95,18 +95,18 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 				n = (byte) 0x0B;
 				break;
 			default:
-				return 0;
+				return (short) -srcOff;
 			}
 
 			if (ni % 2 == 1)
-				converted[ci] |= (n << 4); // upper half-byte
+				cnvrt[ci] |= (n << 4); // upper half-byte come second
 			else
-				converted[ci] = n; // lower half-byte
+				cnvrt[ci] = n; // lower half-byte come first
 		}
 		if (ni % 2 == 1)
-			converted[ci++] |= 0xF0;
+			cnvrt[ci++] |= 0xF0;
 
-		return converted[0] = (byte) (ci - 1);
+		return cnvrt[cnvrtOff] = (byte) (cnvrtOff + ci - 1);
 	}
 
 	// TP-VPF == 0: TP-VP field not present {23.040_9.2.3.3}
@@ -217,8 +217,8 @@ public class Exercise1 extends Applet implements ToolkitInterface, ToolkitConsta
 			return;
 		}
 
-		result = Make_TP_DA(TP_DA, enteredNum, enteredNum_length);
-		if (result == 0)
+		result = (byte) Make_TP_DA(TP_DA, (short) 0, enteredNum, (short) 0, enteredNum_length);
+		if (result < 0)
 			return;
 
 		result = Pack_7bit(TP_UD, enteredText, enteredText_length);

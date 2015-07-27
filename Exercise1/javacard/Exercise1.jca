@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Thu Jul 23 15:48:54 MSK 2015
+// on Mon Jul 27 14:03:01 MSK 2015
 
 .package Exercise1 {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -105,7 +105,7 @@
 		// 40
 		staticFieldRef byte[] Exercise1/enter2_Text;
 		// 41
-		staticMethodRef Exercise1/Make_TP_DA([B[BS)B;
+		staticMethodRef Exercise1/Make_TP_DA([BS[BSS)S;
 		// 42
 		staticMethodRef Exercise1/Pack_7bit([B[BS)B;
 		// 43
@@ -348,7 +348,7 @@
 
 		}
 
-		.method static Pack_7bit([B[BS)B {
+		.method public static Pack_7bit([B[BS)B 0 {
 			.stack 5;
 			.locals 5;
 
@@ -414,65 +414,66 @@
 					sreturn;
 		}
 
-		.method static Make_TP_DA([B[BS)B {
+		.method public static Make_TP_DA([BS[BSS)S 1 {
 			.stack 5;
-			.locals 4;
+			.locals 3;
 
-				L0:	aload_1;
-					sconst_0;
+				L0:	sload_1;
+					sconst_1;
+					sadd;
+					sstore 5;
+					aload_2;
+					sload_3;
 					baload;
 					bspush 43;
 					if_scmpne L2;
 				L1:	aload_0;
-					sconst_1;
+					sload 5;
 					bspush -111;
 					bastore;
-					sconst_1;
-					sstore 4;
+					sinc 3 1;
 					goto L3;
 				L2:	aload_0;
-					sconst_1;
+					sload 5;
 					bspush -127;
 					bastore;
+				L3:	sinc 5 1;
 					sconst_0;
-					sstore 4;
-				L3:	sconst_2;
-					sstore_3;
-					sconst_0;
-					sstore 5;
-				L4:	sload 4;
-					sload_2;
-					if_scmpge L14;
-				L5:	aload_1;
-					sload 4;
-					baload;
 					sstore 6;
-					sload 6;
+				L4:	sload_3;
+					sload 4;
+					if_scmpge_w L14;
+				L5:	aload_2;
+					sload_3;
+					baload;
+					sstore 7;
+					sload 7;
 					stableswitch L9 35 57 L8 L9 L9 L9 L9 L9 L9 L7 L9 L9 L9 L9 L9 L6 L6 L6 L6 L6 L6 L6 L6 L6 L6;
-				L6:	sload 6;
+				L6:	sload 7;
 					bspush 48;
 					ssub;
 					s2b;
-					sstore 6;
+					sstore 7;
 					goto L10;
 				L7:	bspush 10;
-					sstore 6;
+					sstore 7;
 					goto L10;
 				L8:	bspush 11;
-					sstore 6;
+					sstore 7;
 					goto L10;
-				L9:	sconst_0;
+				L9:	sload_3;
+					sneg;
 					sreturn;
-				L10:	sload 5;
+				L10:	sload 6;
 					sconst_2;
 					srem;
 					sconst_1;
 					if_scmpne L12;
 				L11:	aload_0;
-					sload_3;
+					sload 5;
 					dup2;
 					baload;
-					sload 6;
+					sload 7;
 					sconst_4;
 					sshl;
 					sor;
@@ -480,26 +481,26 @@
 					bastore;
 					goto L13;
 				L12:	aload_0;
-					sload_3;
-					sload 6;
-					bastore;
-				L13:	sload_3;
 					sload 5;
+					sload 7;
+					bastore;
+				L13:	sload 5;
+					sload 6;
 					sconst_2;
 					srem;
 					sadd;
-					sstore_3;
-					sinc 4 1;
-					sinc 5 1;
-					goto L4;
-				L14:	sload 5;
+					sstore 5;
+					sinc 3 1;
+					sinc 6 1;
+					goto_w L4;
+				L14:	sload 6;
 					sconst_2;
 					srem;
 					sconst_1;
 					if_scmpne L16;
 				L15:	aload_0;
-					sload_3;
-					sinc 3 1;
+					sload 5;
+					sinc 5 1;
 					dup2;
 					baload;
 					sspush 240;
@@ -507,8 +508,10 @@
 					s2b;
 					bastore;
 				L16:	aload_0;
-					sconst_0;
-					sload_3;
+					sload_1;
+					sload_1;
+					sload 5;
+					sadd;
 					sconst_1;
 					ssub;
 					s2b;
@@ -625,7 +628,7 @@
 					return;
 		}
 
-		.method public static install([BSB)V 0 {
+		.method public static install([BSB)V 2 {
 			.stack 2;
 			.locals 0;
 
@@ -783,12 +786,15 @@
 					goto L6;
 				L5:	return;
 				L6:	getstatic_a 22;		// reference Exercise1/Exercise1.TP_DA
+					sconst_0;
 					getstatic_a 19;		// reference Exercise1/Exercise1.enteredNum
+					sconst_0;
 					sload_1;
-					invokestatic 41;		// Exercise1/Exercise1.Make_TP_DA([B[BS)B
+					invokestatic 41;		// Exercise1/Exercise1.Make_TP_DA([BS[BSS)S
+					s2b;
 					sstore_0;
 					sload_0;
-					ifne L8;
+					ifge L8;
 				L7:	return;
 				L8:	getstatic_a 23;		// reference Exercise1/Exercise1.TP_UD
 					getstatic_a 20;		// reference Exercise1/Exercise1.enteredText
