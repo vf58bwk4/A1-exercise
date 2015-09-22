@@ -1,10 +1,18 @@
 @echo on
 
+set JC_HOME=C:\Java\java_card_kit-2_2_1
+set ETSI_TS=C:\Java\ETSI_TS
+
+set lib=%JC_HOME%\lib\api.jar
+set lib=%ETSI_TS%\ts_143019v050600p0.jar;%lib%
+
+set exp=%JC_HOME%\api_export_files\
+set exp=%ETSI_TS%\exports\ts_143019v050600p0\;%exp%
+
+set PKG=Exercise1
 set PKG_AID=0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0
 set AID=%PKG_AID%:0x1:0x2:0x3:0x4:0x5:0x6
 
-javac -target 1.1 -source 1.3 -cp jars\SUN_JavaCard_2-2-1\jc_SUN_JavaCard_2-2-1.jar;jars\ETSI_43019_6-0-0\jc_ETSI_43019_6-0-0.jar Exercise1\*.java
+javac -target 1.1 -source 1.3 -cp %lib% -d bin src\%PKG%\*.java
 
-set JC_HOME=%JC22_HOME%
-%JC22_HOME%\bin\converter -exportpath exports\SUN_JavaCard_2-2-1;exports\ETSI_43019_6-0-0 -applet %AID% Exercise1 -out CAP EXP JCA Exercise1 %PKG_AID% 0.1
-
+%JC_HOME%\bin\converter -classdir bin -d bin -exportpath %exp% -applet %AID% %PKG% -out CAP EXP JCA %PKG% %PKG_AID% 0.1
