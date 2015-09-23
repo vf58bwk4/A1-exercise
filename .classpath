@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="bin" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/apduio.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/apdutool.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/api.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/capdump.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/converter.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/installer.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/javacardframework.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/jcclientsamples.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/jcrmiclientframework.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/jcwde.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/offcardverifier.jar"/>
+	<classpathentry kind="lib" path="C:/Java/java_card_kit-2_2_1/lib/scriptgen.jar"/>
+	<classpathentry kind="lib" path="C:/Java/ETSI_TS/ts_143019v050600p0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
