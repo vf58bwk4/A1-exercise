@@ -64,15 +64,7 @@
 			<arg line="-sdaid ${gpj.sd_aid} -enc ${gpj.enc} -mac ${gpj.mac} -kek ${gpj.kek}" />
 			<arg line="-deletedeps -delete ${cap.package_aidS}" />
 			<arg line="-load '${cap.dir}/${cap.file}'" />
-		</java>
-		<java classname="apdu4j.SCTool">
-			<classpath refid="classpath" />
-			<arg line="--apdu ${install.apdu}" />
-		</java>
-		<java classname="net.sourceforge.gpj.cardservices.GlobalPlatformService">
-			<classpath refid="classpath" />
-			<arg line="-sdaid ${gpj.sd_aid} -enc ${gpj.enc} -mac ${gpj.mac} -kek ${gpj.kek}" />
-			<arg line="-list" />
+			<arg line="-install -param ${gpj.param}" />
 		</java>
 	</target>
 
