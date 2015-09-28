@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="A1-exercise" default="applet">
+<project name="A1-exercise" default="applet" basedir=".">
 
 	<property file="build.properties" />
+
+	<path id="classpath">
+		<fileset dir="${javacard.lib}" includes="*.jar" />
+		<fileset dir="${etsi.lib}" includes="*.jar" />
+		<fileset dir="${lib.dir}" includes="*.jar" />
+	</path>
 
 	<!-- Definitions for tasks for Java Card tools -->
 	<taskdef name="apdutool" classname="com.sun.javacard.ant.tasks.APDUToolTask" classpath="${jar.jctasks}" />
@@ -18,16 +24,12 @@
 	<typedef name="jcainputfile" classname="com.sun.javacard.ant.types.JCAInputFile" classpath="${jar.jctasks}" />
 	<typedef name="exportfiles" classname="org.apache.tools.ant.types.FileSet" classpath="${jar.jctasks}" />
 
-	<path id="classpath">
-		<fileset dir="${javacard.dir}/lib" includes="*.jar" />
-		<fileset dir="${etsi.dir}" includes="*.jar" />
-		<fileset dir="${lib.dir}" includes="*.jar" />
-	</path>
-
 	<pathconvert property="cap.dir">
 		<path path="${bin.dir}/${cap.package}" />
 		<unpackagemapper from="*" to="*/javacard" />
 	</pathconvert>
+
+	<property name="exportpath" location="${javacard.exp}:${etsi.exp}:${cap.dir}" />
 
 	<pathconvert property="cap.file">
 		<path path="${cap.package}" />
@@ -50,7 +52,7 @@
 	</target>
 
 	<target name="applet" depends="compile">
-		<convert dir="${bin.dir}" JCA="true" EXP="true" CAP="true" nobanner="true" majorminorversion="1.0" packagename="${cap.package}" packageaid="${cap.package_aid}" ExportPath="${javacard.dir}/api_export_files:${etsi.dir}/ts_143019v050600p0.exp:${bin.dir}">
+		<convert dir="${bin.dir}" JCA="true" EXP="true" CAP="true" nobanner="true" majorminorversion="1.0" packagename="${cap.package}" packageaid="${cap.package_aid}" ExportPath="${exportpath}">
 			<AppletNameAID appletname="${cap.applet}" aid="${cap.applet_aid}" />
 			<classpath refid="classpath" />
 		</convert>
@@ -62,6 +64,14 @@
 			<arg line="-sdaid ${gpj.sd_aid} -enc ${gpj.enc} -mac ${gpj.mac} -kek ${gpj.kek}" />
 			<arg line="-deletedeps -delete ${cap.package_aidS}" />
 			<arg line="-load '${cap.dir}/${cap.file}'" />
+		</java>
+		<java classname="apdu4j.SCTool">
+			<classpath refid="classpath" />
+			<arg line="--apdu ${install.apdu}" />
+		</java>
+		<java classname="net.sourceforge.gpj.cardservices.GlobalPlatformService">
+			<classpath refid="classpath" />
+			<arg line="-sdaid ${gpj.sd_aid} -enc ${gpj.enc} -mac ${gpj.mac} -kek ${gpj.kek}" />
 			<arg line="-list" />
 		</java>
 	</target>

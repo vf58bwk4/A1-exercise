@@ -12,7 +12,7 @@ public class Exercise1Test {
 		byte[] convertedNumber = new byte[8];
 		int converted;
 
-		converted = Exercise1.Make_TP_DA(convertedNumber, (short) 0, enteredNumber1, (short) 0,
+		converted = Exercise1.makeTP_DA(convertedNumber, (short) 0, enteredNumber1, (short) 0,
 				(short) enteredNumber1.length);
 		System.out.println("Converted = " + converted);
 		if (converted >= 0) {
@@ -39,17 +39,17 @@ public class Exercise1Test {
 		byte[] expectedNumber3 = { (byte) 0x04, (byte) 0x81, (byte) 0x98, (byte) 0x2A, (byte) 0xFB };
 		byte[] actualNumber3 = new byte[expectedNumber3.length];
 
-		convertedLen = Exercise1.Make_TP_DA(actualNumber1, (short) 0, enteredNumber1, (short) 0,
+		convertedLen = Exercise1.makeTP_DA(actualNumber1, (short) 0, enteredNumber1, (short) 0,
 				(short) enteredNumber1.length);
 		assertEquals(convertedLen, expectedNumber1[0]);
 		assertArrayEquals("Haha", expectedNumber1, actualNumber1);
 
-		convertedLen = Exercise1.Make_TP_DA(actualNumber2, (short) 0, enteredNumber2, (short) 0,
+		convertedLen = Exercise1.makeTP_DA(actualNumber2, (short) 0, enteredNumber2, (short) 0,
 				(short) enteredNumber2.length);
 		assertEquals(convertedLen, expectedNumber2[0]);
 		assertArrayEquals("Haha", expectedNumber2, actualNumber2);
 
-		convertedLen = Exercise1.Make_TP_DA(actualNumber3, (short) 0, enteredNumber3, (short) 0,
+		convertedLen = Exercise1.makeTP_DA(actualNumber3, (short) 0, enteredNumber3, (short) 0,
 				(short) enteredNumber3.length);
 		assertEquals(convertedLen, expectedNumber3[0]);
 		assertArrayEquals("Haha", expectedNumber3, actualNumber3);
@@ -63,7 +63,7 @@ public class Exercise1Test {
 		byte[] test3 = { 'A' };
 		byte[] pack = new byte[20];
 
-		l7 = Exercise1.Pack_7bit(pack, test3, (short) test3.length);
+		l7 = Exercise1.pack7Bit(pack, test3, (short) test3.length);
 		for (int i = 0; i < l7; i++) {
 			System.out.format("%02X", pack[i]);
 		}
